@@ -1,0 +1,391 @@
+```ejs
+<%- include('../partials/header') %>
+
+<style>
+body{
+    background:#f1f5f9;
+}
+
+.stat-card{
+    border:none;
+    border-radius:18px;
+    color:white;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.bg-red{
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+.sidebar-card,
+.main-card{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.sidebar-card .list-group-item{
+    border:none;
+    padding:16px 20px;
+    transition:.3s;
+}
+
+.sidebar-card .list-group-item:hover{
+    background:#f8fafc;
+    padding-left:28px;
+}
+
+.sidebar-card .active{
+    background:linear-gradient(135deg,#dc2626,#ef4444)!important;
+    color:white!important;
+}
+
+.dispatch-header{
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+    color:white;
+}
+
+.report-item{
+    border:none;
+    border-radius:12px;
+    margin-bottom:10px;
+    transition:.3s;
+}
+
+.report-item:hover{
+    transform:translateX(5px);
+    background:#fff5f5;
+}
+
+.selected-report{
+    border-radius:15px;
+    background:#f8fafc;
+}
+
+.btn-dispatch{
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+    border:none;
+    color:white;
+    border-radius:12px;
+    font-weight:700;
+    height:55px;
+    transition:.3s;
+}
+
+.btn-dispatch:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(220,38,38,.25);
+    color:white;
+}
+
+.queue-container{
+    max-height:550px;
+    overflow-y:auto;
+}
+
+.queue-container::-webkit-scrollbar{
+    width:6px;
+}
+
+.queue-container::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:20px;
+}
+
+.empty-icon{
+    font-size:70px;
+}
+
+.form-control,
+.form-select{
+    border-radius:12px;
+}
+
+.section-title{
+    font-weight:700;
+    color:#1e293b;
+}
+</style>
+
+<div class="container-fluid mt-4 mb-5 px-4">
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card stat-card bg-red">
+                <div class="card-body">
+                    <small>Antrean Dispatch</small>
+                    <h2><%= reports.length %></h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card sidebar-card">
+
+                <div class="card-body p-0">
+
+                    <div class="list-group list-group-flush">
+
+                        <a href="/admin/dashboard"
+                           class="list-group-item list-group-item-action">
+                            🗺️ GIS Map Center
+                        </a>
+
+                        <a href="/admin/reports"
+                           class="list-group-item list-group-item-action">
+                            📋 Manajemen Laporan
+                        </a>
+
+                        <a href="/admin/dispatch"
+                           class="list-group-item list-group-item-action active">
+                            🚨 Dispatch Instansi
+                        </a>
+
+                        <a href="/admin/settings"
+                           class="list-group-item list-group-item-action text-danger fw-bold">
+                            ⚙️ Pengaturan
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-md-9">
+
+            <div class="card main-card">
+
+                <div class="card-header dispatch-header py-3">
+
+                    <h4 class="mb-1 fw-bold">
+                        🚨 Emergency Dispatch Center
+                    </h4>
+
+                    <small>
+                        Penugasan Instansi Penanganan Laporan Darurat
+                    </small>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <!-- ANTREAN -->
+                        <div class="col-md-5 border-end">
+
+                            <h6 class="section-title mb-3">
+                                Antrean Laporan Darurat
+                            </h6>
+
+                            <div class="queue-container">
+
+                                <% if (reports.length === 0) { %>
+
+                                    <div class="alert alert-success text-center">
+                                        Tidak ada laporan darurat yang menunggu.
+                                    </div>
+
+                                <% } %>
+
+                                <% reports.forEach(report => { %>
+
+                                    <button
+                                        class="list-group-item report-item list-group-item-action"
+
+                                        onclick="selectReport(
+                                            '<%= report.id %>',
+                                            '<%= report.kategori %>',
+                                            '<%= report.username %>',
+                                            '<%= report.deskripsi %>'
+                                        )">
+
+                                        <div class="d-flex justify-content-between">
+
+                                            <h6 class="fw-bold text-danger">
+                                                🚨 <%= report.kategori %>
+                                            </h6>
+
+                                            <small>
+                                                <%= new Date(report.created_at).toLocaleTimeString('id-ID') %>
+                                            </small>
+
+                                        </div>
+
+                                        <p class="small mb-1 text-truncate">
+                                            <%= report.deskripsi %>
+                                        </p>
+
+                                        <small class="text-muted">
+                                            Pelapor: <%= report.username %>
+                                        </small>
+
+                                    </button>
+
+                                <% }) %>
+
+                            </div>
+
+                        </div>
+
+                        <!-- FORM DISPATCH -->
+                        <div class="col-md-7 ps-md-4">
+
+                            <h6 class="section-title mb-3">
+                                Dispatch Operation
+                            </h6>
+
+                            <div id="empty-state"
+                                 class="text-center py-5 text-muted">
+
+                                <div class="empty-icon">
+                                    📡
+                                </div>
+
+                                <h5>
+                                    Pilih laporan terlebih dahulu
+                                </h5>
+
+                                <p>
+                                    Klik salah satu laporan di panel kiri untuk memulai proses dispatch.
+                                </p>
+
+                            </div>
+
+                            <form id="dispatch-form"
+                                  action="/admin/dispatch"
+                                  method="POST"
+                                  style="display:none;">
+
+                                <input
+                                    type="hidden"
+                                    name="report_id"
+                                    id="selected_report_id">
+
+                                <div class="card selected-report border-0 mb-3">
+
+                                    <div class="card-body">
+
+                                        <h5 id="detail_kategori"
+                                            class="text-danger fw-bold mb-2">
+                                        </h5>
+
+                                        <div class="mb-2">
+                                            <strong>Pelapor:</strong>
+                                            <span id="detail_pelapor"></span>
+                                        </div>
+
+                                        <p id="detail_deskripsi"
+                                           class="fst-italic mb-0">
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label fw-bold">
+                                        Instansi Penanganan
+                                    </label>
+
+                                    <select name="contact_id"
+                                            class="form-select"
+                                            required>
+
+                                        <option value="" disabled selected>
+                                            Pilih Instansi...
+                                        </option>
+
+                                        <% contacts.forEach(contact => { %>
+
+                                            <option value="<%= contact.id %>">
+                                                <%= contact.nama_instansi %>
+                                                (<%= contact.jenis %>)
+                                                - <%= contact.nomor_telp %>
+                                            </option>
+
+                                        <% }) %>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <label class="form-label fw-bold">
+                                        Instruksi Operasi
+                                    </label>
+
+                                    <textarea
+                                        name="pesan_instruksi"
+                                        id="pesan_instruksi"
+                                        class="form-control"
+                                        rows="4"
+                                        placeholder="Contoh: Unit terdekat segera menuju lokasi kejadian..."
+                                        required></textarea>
+
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-dispatch w-100">
+
+                                    🚨 KIRIM DISPATCH SEKARANG
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function selectReport(id, kategori, pelapor, deskripsi){
+
+    document.getElementById('empty-state').style.display='none';
+
+    document.getElementById('dispatch-form').style.display='block';
+
+    document.getElementById('selected_report_id').value=id;
+
+    document.getElementById('detail_kategori').innerText=
+        '🚨 ' + kategori;
+
+    document.getElementById('detail_pelapor').innerText=
+        pelapor;
+
+    document.getElementById('detail_deskripsi').innerText=
+        '"' + deskripsi + '"';
+}
+
+</script>
+
+</body>
+</html>
+```

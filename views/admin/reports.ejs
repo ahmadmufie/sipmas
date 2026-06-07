@@ -1,0 +1,95 @@
+<%- include('../partials/header') %>
+
+<style>
+    body { background: #f1f5f9; }
+    .stat-card { border: none; border-radius: 18px; color: white; box-shadow: 0 8px 25px rgba(0,0,0,.08); }
+    .bg-red { background: linear-gradient(135deg,#dc2626,#ef4444); }
+    .bg-yellow { background: linear-gradient(135deg,#f59e0b,#fbbf24); }
+    .bg-green { background: linear-gradient(135deg,#16a34a,#22c55e); }
+    .bg-blue { background: linear-gradient(135deg,#0f4c81,#3b82f6); }
+    .content-card { border: none; border-radius: 18px; box-shadow: 0 8px 25px rgba(0,0,0,.08); }
+    .img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
+    .img-preview:hover { transform: scale(1.05); }
+    .status-badge { padding: 7px 12px; border-radius: 30px; font-size: 12px; }
+</style>
+
+<div class="container-fluid mt-4 mb-5 px-4">
+    <div class="row mb-4">
+        <div class="col-md-3"><div class="card stat-card bg-blue p-3">Total: <h2><%= reports.length %></h2></div></div>
+        <div class="col-md-3"><div class="card stat-card bg-red p-3">Menunggu: <h2><%= reports.filter(r => r.status === 'Menunggu').length %></h2></div></div>
+        <div class="col-md-3"><div class="card stat-card bg-yellow p-3">Diproses: <h2><%= reports.filter(r => r.status === 'Diproses').length %></h2></div></div>
+        <div class="col-md-3"><div class="card stat-card bg-green p-3">Selesai: <h2><%= reports.filter(r => r.status === 'Selesai').length %></h2></div></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="/admin/dashboard" class="list-group-item">🗺️ GIS Map Center</a>
+                <a href="/admin/reports" class="list-group-item active">📋 Manajemen Laporan</a>
+                <a href="/admin/dispatch" class="list-group-item">🚨 Dispatch Instansi</a>
+                <a href="/admin/settings" class="list-group-item text-danger">⚙️ Pengaturan</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card content-card p-4">
+                <h4>Manajemen Pengaduan</h4>
+                <table class="table align-middle mt-3">
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Foto</th>
+                            <th>Pelapor</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% reports.forEach(report => { %>
+                        <tr>
+                            <td><%= new Date(report.created_at).toLocaleString('id-ID') %></td>
+                            <td>
+                                <% if (report.foto) { %>
+                                    <img src="/uploads/<%= report.foto %>" class="img-preview" alt="Foto Laporan" onclick="openImageModal('/uploads/<%= report.foto %>')">
+                                <% } else { %>
+                                    <div class="img-preview bg-light d-flex align-items-center justify-content-center"><small>No Img</small></div>
+                                <% } %>
+                            </td>
+                            <td><%= report.username %></td>
+                            <td><span class="badge bg-info"><%= report.status %></span></td>
+                            <td>
+                                <form action="/admin/reports/update-status" method="POST">
+                                    <input type="hidden" name="report_id" value="<%= report.id %>">
+                                    <button name="status" value="Diproses" class="btn btn-outline-warning btn-sm">Proses</button>
+                                    <button name="status" value="Selesai" class="btn btn-outline-success btn-sm">Selesai</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 text-center">
+                <img src="" id="modalImage" class="img-fluid rounded shadow-lg" style="max-height: 80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openImageModal(src) {
+        document.getElementById('modalImage').src = src;
+        var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        myModal.show();
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+```ejs
+<%- include('../partials/header') %>
+
+<style>
+body{
+    background:#f1f5f9;
+}
+
+.dashboard-title{
+    font-weight:700;
+    color:#1e293b;
+}
+
+.stat-card{
+    border:none;
+    border-radius:18px;
+    color:white;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.stat-card:hover{
+    transform:translateY(-4px);
+}
+
+.stat-card .card-body{
+    padding:20px;
+}
+
+.stat-card h2{
+    margin:0;
+    font-weight:700;
+}
+
+.bg-red{
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+.bg-yellow{
+    background:linear-gradient(135deg,#f59e0b,#fbbf24);
+}
+
+.bg-green{
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+}
+
+.bg-blue{
+    background:linear-gradient(135deg,#0f4c81,#3b82f6);
+}
+
+.sidebar-card{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.sidebar-card .list-group-item{
+    border:none;
+    padding:16px 20px;
+    font-weight:500;
+    transition:.3s;
+}
+
+.sidebar-card .list-group-item:hover{
+    background:#f8fafc;
+    padding-left:28px;
+}
+
+.sidebar-card .active{
+    background:linear-gradient(135deg,#0f4c81,#1c6ea4)!important;
+    color:white!important;
+}
+
+.map-card{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.map-header{
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.map-title{
+    font-weight:700;
+    color:#1e293b;
+}
+
+.status-badge{
+    padding:8px 14px;
+    border-radius:30px;
+    font-size:12px;
+}
+
+#admin-map{
+    height:650px;
+    width:100%;
+}
+
+.custom-popup img{
+    border-radius:8px;
+}
+
+.custom-popup h6{
+    color:#0f4c81;
+}
+
+.btn-detail{
+    background:#0f4c81;
+    color:white;
+    border:none;
+}
+
+.btn-detail:hover{
+    background:#0b3a63;
+    color:white;
+}
+</style>
+
+<div class="container-fluid mt-4 mb-5 px-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="dashboard-title mb-1">
+                🚨 SIPMAS Command Center
+            </h3>
+            <small class="text-muted">
+                Monitoring dan Pengelolaan Laporan Masyarakat Secara Realtime
+            </small>
+        </div>
+    </div>
+
+    <!-- Statistik -->
+    <div class="row mb-4">
+
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card bg-red">
+                <div class="card-body">
+                    <small>Laporan Menunggu</small>
+                    <h2 id="waiting-count">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card bg-yellow">
+                <div class="card-body">
+                    <small>Sedang Diproses</small>
+                    <h2 id="process-count">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card bg-green">
+                <div class="card-body">
+                    <small>Laporan Selesai</small>
+                    <h2 id="done-count">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card bg-blue">
+                <div class="card-body">
+                    <small>Total Laporan</small>
+                    <h2 id="total-count">0</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card sidebar-card">
+
+                <div class="card-body p-0">
+
+                    <div class="list-group list-group-flush">
+
+                        <a href="/admin/dashboard"
+                           class="list-group-item list-group-item-action active">
+                            🗺️ GIS Map Center
+                        </a>
+
+                        <a href="/admin/reports"
+                           class="list-group-item list-group-item-action">
+                            📋 Manajemen Laporan
+                        </a>
+
+                        <a href="/admin/dispatch"
+                           class="list-group-item list-group-item-action">
+                            🚨 Dispatch Instansi
+                        </a>
+
+                        <a href="/admin/settings"
+                           class="list-group-item list-group-item-action text-danger fw-bold">
+                            ⚙️ Pengaturan
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Peta -->
+        <div class="col-md-9">
+
+            <div class="card map-card">
+
+                <div class="card-header map-header py-3 d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <h5 class="map-title mb-1">
+                            🗺️ GIS Monitoring Center
+                        </h5>
+
+                        <small class="text-muted">
+                            Sebaran laporan masyarakat secara realtime
+                        </small>
+                    </div>
+
+                    <div>
+                        <span class="badge bg-danger status-badge">
+                            Menunggu
+                        </span>
+
+                        <span class="badge bg-warning text-dark status-badge">
+                            Diproses
+                        </span>
+
+                        <span class="badge bg-success status-badge">
+                            Selesai
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="card-body p-0">
+                    <div id="admin-map"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+// Inisialisasi Peta Admin
+const adminMap = L.map('admin-map').setView(
+    [-6.914744, 107.609810],
+    12
+);
+
+L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+        attribution:'© OpenStreetMap contributors'
+    }
+).addTo(adminMap);
+
+
+// Ambil data laporan
+fetch('/reports/gis-data')
+
+.then(res => res.json())
+
+.then(data => {
+
+    // Statistik
+    document.getElementById('total-count').textContent =
+        data.length;
+
+    document.getElementById('waiting-count').textContent =
+        data.filter(
+            r => r.status === 'Menunggu'
+        ).length;
+
+    document.getElementById('process-count').textContent =
+        data.filter(
+            r => r.status === 'Diproses'
+        ).length;
+
+    document.getElementById('done-count').textContent =
+        data.filter(
+            r => r.status === 'Selesai'
+        ).length;
+
+
+    // Marker
+    data.forEach(report => {
+
+        let color = '#D90429';
+
+        if(report.status === 'Diproses')
+            color = '#FFC107';
+
+        if(report.status === 'Selesai')
+            color = '#198754';
+
+        const customIcon = L.divIcon({
+
+            className:'custom-marker',
+
+            html:`
+                <div
+                    style="
+                        background:${color};
+                        width:24px;
+                        height:24px;
+                        border-radius:50%;
+                        border:3px solid white;
+                        box-shadow:0 0 6px rgba(0,0,0,.4);
+                    ">
+                </div>
+            `,
+
+            iconSize:[24,24],
+            iconAnchor:[12,12]
+
+        });
+
+        const marker = L.marker(
+            [
+                report.latitude,
+                report.longitude
+            ],
+            {
+                icon:customIcon
+            }
+        ).addTo(adminMap);
+
+        marker.bindPopup(`
+
+            <div class="custom-popup" style="min-width:220px;">
+
+                <h6 class="fw-bold border-bottom pb-2">
+                    ${report.kategori}
+                </h6>
+
+                <div class="small mb-2">
+
+                    <strong>Pelapor:</strong>
+                    ${report.nama_lengkap}
+
+                    <br>
+
+                    <strong>Status:</strong>
+                    ${report.status}
+
+                    <br>
+
+                    <strong>Waktu:</strong>
+
+                    ${new Date(
+                        report.created_at
+                    ).toLocaleString('id-ID')}
+
+                </div>
+
+                <p class="small border rounded p-2 bg-light">
+
+                    ${report.deskripsi}
+
+                </p>
+
+                ${
+                    report.foto
+                    ?
+                    `
+                    <img
+                        src="/uploads/${report.foto}"
+                        style="
+                            width:100%;
+                            height:120px;
+                            object-fit:cover;
+                            margin-bottom:10px;
+                        "
+                    >
+                    `
+                    :
+                    ''
+                }
+
+                <button
+                    class="btn btn-detail btn-sm w-100">
+
+                    Detail & Tindakan
+
+                </button>
+
+            </div>
+
+        `);
+
+    });
+
+})
+
+.catch(err => {
+
+    console.error(
+        'Gagal memuat data GIS:',
+        err
+    );
+
+});
+</script>
+
+</body>
+</html>
+```

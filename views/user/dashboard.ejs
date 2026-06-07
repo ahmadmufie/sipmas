@@ -1,0 +1,157 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4 mb-5">
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="/user/lapor" class="btn btn-emergency w-100 py-3 fw-bold shadow" style="font-size: 1.2rem; border-radius: 10px;">
+                🚨 KLIK DI SINI UNTUK BUAT LAPORAN DARURAT
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            
+            <div class="card shadow border-0 rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Riwayat Laporan Anda</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Kategori</th>
+                                    <th>Status Penanganan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (reports.length === 0) { %>
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">Belum ada laporan yang Anda kirimkan.</td>
+                                    </tr>
+                                <% } else { %>
+                                    <% reports.forEach(report => { %>
+                                        <tr>
+                                            <td><small><%= new Date(report.created_at).toLocaleString('id-ID') %></small></td>
+                                            <td class="fw-bold"><%= report.kategori %></td>
+                                            <td>
+                                                <% if (report.status === 'Menunggu') { %>
+                                                    <span class="badge bg-danger">Menunggu (Antrean)</span>
+                                                <% } else if (report.status === 'Diproses') { %>
+                                                    <span class="badge bg-warning text-dark">Sedang Ditangani Instansi</span>
+                                                <% } else if (report.status === 'Selesai') { %>
+                                                    <span class="badge bg-success">Sudah Beres</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-secondary"><%= report.status %></span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold">Posisi Anda Saat Ini</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 250px; width: 100%; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow border-0 rounded-3 mb-4">
+                <div class="card-header bg-police text-white py-3">
+                    <h5 class="mb-0 fw-bold">📞 Panggilan Instansi</h5>
+                </div>
+                <div class="card-body">
+                    <a href="tel:110" class="btn btn-primary w-100 mb-2 py-2 fw-bold d-flex justify-content-between align-items-center">
+                        <span>👮 Polisi</span> <span>110</span>
+                    </a>
+                    <a href="tel:113" class="btn btn-danger w-100 mb-2 py-2 fw-bold d-flex justify-content-between align-items-center">
+                        <span>🚒 Damkar</span> <span>113</span>
+                    </a>
+                    <a href="tel:118" class="btn btn-success w-100 mb-2 py-2 fw-bold d-flex justify-content-between align-items-center">
+                        <span>🚑 Ambulans</span> <span>118</span>
+                    </a>
+                    <a href="tel:117" class="btn btn-warning w-100 py-2 fw-bold text-dark d-flex justify-content-between align-items-center">
+                        <span>🌪️ BPBD</span> <span>117</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0 fw-bold">🤖 Asisten AI P3K</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="chat-box" class="p-3" style="height: 250px; overflow-y: auto; background-color: #f8f9fa;">
+                        <div class="text-start mb-2">
+                            <span class="badge bg-secondary text-wrap p-2 text-start lh-base" style="font-size: 0.85rem;">
+                                Halo! Saya AI SIPMAS. Ada panduan P3K atau SOP darurat yang ingin ditanyakan?
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white p-3">
+                    <div class="input-group">
+                        <input type="text" id="chat-input" class="form-control" placeholder="Tanya sesuatu..." onkeypress="if(event.key === 'Enter') sendChat()">
+                        <button class="btn btn-dark" onclick="sendChat()">Kirim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Peta Lokasi User di Dashboard
+    const map = L.map('map').setView([-6.914744, 107.609810], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    map.locate({setView: true, maxZoom: 16});
+    map.on('locationfound', function(e) {
+        L.marker(e.latlng).addTo(map).bindPopup("Lokasi Anda Saat Ini").openPopup();
+    });
+
+    // Chatbot AI AI
+    async function sendChat() {
+        const inputField = document.getElementById('chat-input');
+        const input = inputField.value.trim();
+        if(!input) return;
+        
+        const box = document.getElementById('chat-box');
+        box.innerHTML += `<div class="text-end mb-2"><span class="badge bg-primary text-wrap p-2 text-start lh-base" style="font-size: 0.85rem;">${input}</span></div>`;
+        inputField.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        const loadingId = 'loading-' + Date.now();
+        box.innerHTML += `<div class="text-start mb-2" id="${loadingId}"><span class="badge bg-secondary text-wrap p-2 text-start lh-base">Mengetik...</span></div>`;
+        box.scrollTop = box.scrollHeight;
+
+        try {
+            const res = await fetch('/ai/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: input})
+            });
+            const data = await res.json();
+            document.getElementById(loadingId).remove();
+            box.innerHTML += `<div class="text-start mb-2"><span class="badge bg-secondary text-wrap p-2 text-start lh-base" style="font-size: 0.85rem;">${data.reply.replace(/\n/g, '<br>')}</span></div>`;
+            box.scrollTop = box.scrollHeight;
+        } catch (error) {
+            document.getElementById(loadingId).remove();
+        }
+    }
+</script>
+</body>
+</html>

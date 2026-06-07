@@ -1,0 +1,288 @@
+```ejs
+<%- include('../partials/header') %>
+
+<style>
+body{
+    background:#f1f5f9;
+}
+
+.stat-card{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    color:white;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.bg-blue{
+    background:linear-gradient(135deg,#0f4c81,#3b82f6);
+}
+
+.sidebar-card,
+.content-card{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.sidebar-card .list-group-item{
+    border:none;
+    padding:16px 20px;
+    transition:.3s;
+}
+
+.sidebar-card .list-group-item:hover{
+    background:#f8fafc;
+    padding-left:28px;
+}
+
+.sidebar-card .active{
+    background:linear-gradient(135deg,#0f4c81,#1c6ea4)!important;
+    color:white!important;
+}
+
+.content-header{
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.page-title{
+    font-weight:700;
+    color:#1e293b;
+}
+
+.form-control{
+    border-radius:12px;
+    height:50px;
+}
+
+.btn-add{
+    height:50px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#0f4c81,#3b82f6);
+    color:white;
+    font-weight:600;
+}
+
+.btn-add:hover{
+    color:white;
+}
+
+.table thead{
+    background:#0f172a;
+    color:white;
+}
+
+.table tbody tr:hover{
+    background:#f8fafc;
+}
+</style>
+
+<div class="container-fluid mt-4 mb-5 px-4">
+
+    <!-- Statistik -->
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card stat-card bg-blue">
+
+                <div class="card-body">
+
+                    <small>Total Instansi Terdaftar</small>
+
+                    <h2>
+                        <%= contacts.length %>
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card sidebar-card">
+
+                <div class="card-body p-0">
+
+                    <div class="list-group list-group-flush">
+
+                        <a href="/admin/dashboard"
+                           class="list-group-item list-group-item-action">
+                            🗺️ GIS Map Center
+                        </a>
+
+                        <a href="/admin/reports"
+                           class="list-group-item list-group-item-action">
+                            📋 Manajemen Laporan
+                        </a>
+
+                        <a href="/admin/dispatch"
+                           class="list-group-item list-group-item-action">
+                            🚨 Dispatch Instansi
+                        </a>
+
+                        <a href="/admin/settings"
+                           class="list-group-item list-group-item-action active">
+                            ⚙️ Pengaturan
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Content -->
+        <div class="col-md-9">
+
+            <div class="card content-card">
+
+                <div class="card-header content-header py-3">
+
+                    <h4 class="page-title mb-1">
+                        ⚙️ Pengaturan Instansi
+                    </h4>
+
+                    <small class="text-muted">
+                        Kelola data instansi penanganan laporan darurat
+                    </small>
+
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Form Tambah Instansi -->
+                    <form action="/admin/settings/add-contact"
+                          method="POST"
+                          class="row g-3 mb-4">
+
+                        <div class="col-md-4">
+
+                            <input type="text"
+                                   name="nama_instansi"
+                                   class="form-control"
+                                   placeholder="Nama Instansi"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <input type="text"
+                                   name="jenis"
+                                   class="form-control"
+                                   placeholder="Jenis Instansi"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <input type="text"
+                                   name="nomor_telp"
+                                   class="form-control"
+                                   placeholder="Nomor Telepon"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <button type="submit"
+                                    class="btn btn-add w-100">
+
+                                Tambah
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <!-- Tabel Instansi -->
+                    <div class="table-responsive">
+
+                        <table class="table align-middle">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Nama Instansi</th>
+                                    <th>Jenis</th>
+                                    <th>Nomor Telepon</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <% if(contacts.length === 0){ %>
+
+                                    <tr>
+
+                                        <td colspan="3"
+                                            class="text-center py-4">
+
+                                            Belum ada instansi yang terdaftar.
+
+                                        </td>
+
+                                    </tr>
+
+                                <% } %>
+
+                                <% contacts.forEach(c => { %>
+
+                                    <tr>
+
+                                        <td class="fw-semibold">
+                                            <%= c.nama_instansi %>
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                <%= c.jenis %>
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <%= c.nomor_telp %>
+                                        </td>
+
+                                    </tr>
+
+                                <% }) %>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+```

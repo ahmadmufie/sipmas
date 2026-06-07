@@ -1,0 +1,167 @@
+<%- include('../partials/header') %>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        min-height: 100vh;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .login-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #0f4c81, #1c6ea4);
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+    }
+
+    .login-header img {
+        width: 80px;
+        margin-bottom: 15px;
+    }
+
+    .login-header h3 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .login-header p {
+        margin: 0;
+        opacity: .9;
+        font-size: 14px;
+    }
+
+    .login-body {
+        background: white;
+        padding: 35px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .form-control {
+        height: 50px;
+        border-radius: 12px;
+        border: 1px solid #dbeafe;
+        transition: all .3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0f4c81;
+        box-shadow: 0 0 0 0.2rem rgba(15, 76, 129, 0.15);
+    }
+
+    .btn-login {
+        background: linear-gradient(135deg, #0f4c81, #1c6ea4);
+        border: none;
+        border-radius: 12px;
+        height: 50px;
+        color: white;
+        font-weight: 700;
+        transition: .3s;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15, 76, 129, .3);
+    }
+
+    .register-link a {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline !important;
+    }
+
+    .security-note {
+        background: #f8fafc;
+        border-left: 4px solid #0f4c81;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="col-md-5 col-lg-4">
+        <div class="card login-card">
+
+            <div class="login-header">
+                <h3>SIPMAS</h3>
+                <p>Sistem Informasi Pengaduan Masyarakat</p>
+            </div>
+
+            <div class="login-body">
+                <form action="/auth/login" method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Username
+                        </label>
+                        <input
+                            type="text"
+                            name="username"
+                            class="form-control"
+                            placeholder="Masukkan Username"
+                            required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Masukkan Password"
+                            required>
+                    </div>
+
+                    <button type="submit" class="btn btn-login w-100">
+                        Login
+                    </button>
+
+                </form>
+
+                <div class="security-note">
+                    🔒 Data login dilindungi dan digunakan hanya untuk proses autentikasi pengguna SIPMAS.
+                </div>
+
+                <div class="text-center mt-4 register-link">
+                    <p class="mb-1 text-muted">
+                        Belum memiliki akun?
+                    </p>
+                    <a href="/auth/register" class="text-decoration-none">
+                        Daftar Sekarang
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

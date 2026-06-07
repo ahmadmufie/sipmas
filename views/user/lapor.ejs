@@ -1,0 +1,83 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <a href="/user/dashboard" class="btn btn-outline-secondary mb-3 fw-bold">← Kembali ke Dashboard</a>
+
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-danger text-white py-3">
+                    <h4 class="mb-0 fw-bold">🚨 Form Pelaporan Darurat</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/reports/create" method="POST" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Kategori Kejadian</label>
+                                <select name="kategori" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Kategori...</option>
+                                    <option value="Kriminalitas">Kriminalitas</option>
+                                    <option value="Kecelakaan">Kecelakaan</option>
+                                    <option value="Kebakaran">Kebakaran</option>
+                                    <option value="Darurat Medis">Darurat Medis</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Upload Foto Bukti (Opsional)</label>
+                                <input type="file" name="foto" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Deskripsi Kejadian</label>
+                            <textarea name="deskripsi" class="form-control" rows="4" placeholder="Jelaskan detail kejadian, ciri-ciri pelaku/korban, atau kondisi saat ini..." required></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Tandai Lokasi Kejadian</label>
+                            <div class="text-danger small mb-2 fw-bold">Geser pin merah pada peta di bawah ke titik kejadian yang tepat.</div>
+                            <div id="map" style="height: 350px; width: 100%; border-radius: 8px; border: 2px solid #ced4da;"></div>
+                            
+                            <input type="hidden" name="latitude" id="lat">
+                            <input type="hidden" name="longitude" id="lng">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-danger w-100 py-3 fw-bold fs-5 shadow-sm">KIRIM LAPORAN SEKARANG</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Peta untuk menentukan koordinat form lapor
+    const map = L.map('map').setView([-6.914744, 107.609810], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    let marker;
+    map.locate({setView: true, maxZoom: 16});
+    
+    map.on('locationfound', function(e) {
+        if(marker) map.removeLayer(marker);
+        marker = L.marker(e.latlng, {draggable: true}).addTo(map);
+        updateInput(e.latlng);
+        marker.on('dragend', function() { updateInput(marker.getLatLng()); });
+    });
+
+    map.on('locationerror', function(e) {
+        marker = L.marker(map.getCenter(), {draggable: true}).addTo(map);
+        updateInput(map.getCenter());
+        marker.on('dragend', function() { updateInput(marker.getLatLng()); });
+    });
+
+    function updateInput(latlng) {
+        document.getElementById('lat').value = latlng.lat;
+        document.getElementById('lng').value = latlng.lng;
+    }
+</script>
+</body>
+</html>
