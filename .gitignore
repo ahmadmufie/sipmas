@@ -10,3 +10,14 @@ npm-debug.log
 
 # Log files
 *.log
+
+# hasil terraform init dan grafana
+**/terraform/.terraform/
+.terraform/
+
+**/*.tfstate
+**/*.tfstate.backup
+*.tfstate
+*.tfstate.backup
+
+.grafana/

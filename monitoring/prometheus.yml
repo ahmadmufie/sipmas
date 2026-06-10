@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s # Mengambil data metrik setiap 15 detik
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Jika Anda ingin memantau aplikasi backend Node.js Anda kelak:
+  # - job_name: 'sipmas-backend'
+  #   static_configs:
+  #     - targets: ['app:5000']
