@@ -12,7 +12,7 @@ provider "azurerm" {
   features {}
 }
 
-# Membuat Resource Group Khusus Jaringan agar Rapi
+# Membuat Resource Group 
 resource "azurerm_resource_group" "rg_network" {
   name     = "rg-sipmas-network"
   location = "Southeast Asia"
@@ -26,14 +26,14 @@ resource "azurerm_virtual_network" "vnet_sipmas" {
   resource_group_name = azurerm_resource_group.rg_network.name
 }
 
-# Membuat Subnet 1: Khusus untuk Web App (Frontend & Backend)
+# Membuat Subnet 1: Khusus untuk Web App 
 resource "azurerm_subnet" "subnet_web" {
   name                 = "subnet-web-app"
   resource_group_name  = azurerm_resource_group.rg_network.name
   virtual_network_name = azurerm_virtual_network.vnet_sipmas.name
   address_prefixes     = ["10.0.1.0/24"]
   
-  # Delegasi khusus agar Azure Web App bisa masuk ke subnet ini
+  # Delegasi khusus agar Azure Web App bisa masuk
   delegation {
     name = "delegation"
     service_delegation {
@@ -43,7 +43,7 @@ resource "azurerm_subnet" "subnet_web" {
   }
 }
 
-# Membuat Subnet 2: Khusus untuk Database (Terisolasi dari Internet Publik)
+# Membuat Subnet 2: Khusus untuk Database 
 resource "azurerm_subnet" "subnet_db" {
   name                 = "subnet-database"
   resource_group_name  = azurerm_resource_group.rg_network.name
