@@ -3,8 +3,10 @@ const db = require('../config/database');
 exports.createReport = async (req, res) => {
     const { kategori, deskripsi, latitude, longitude } = req.body;
     const userId = req.session.user.id;
-    // Cek apakah ada file foto yang diunggah
-    const foto = req.file ? req.file.filename : null;
+    
+    // UBAH KE CLOUD-NATIVE: 
+    // Menggunakan req.file.location untuk mengambil URL dari AWS S3.
+    const foto = req.file ? req.file.location : null;
 
     try {
         await db.query(
@@ -32,10 +34,11 @@ exports.getGisData = async (req, res) => {
         res.status(500).json([]);
     }
 };
-// Tambahkan di baris paling bawah
+
+// Menampilkan Halaman Semua Laporan (Admin)
 exports.getAdminReportsPage = async (req, res) => {
     try {
-        // Query ini otomatis mengambil kolom 'foto' karena menggunakan r.*
+        // Query ini otomatis mengambil kolom 'foto' (yang sekarang berisi URL S3) karena menggunakan r.*
         const [reports] = await db.query(`
             SELECT r.*, u.username 
             FROM reports r 
@@ -52,7 +55,6 @@ exports.getAdminReportsPage = async (req, res) => {
 // Menampilkan Halaman Dispatch Instansi
 exports.getDispatchPage = async (req, res) => {
     try {
-        // UBAH: u.nama_lengkap menjadi u.username
         const [reports] = await db.query(`
             SELECT r.*, u.username, u.no_telp 
             FROM reports r 
@@ -70,11 +72,9 @@ exports.getDispatchPage = async (req, res) => {
 
 // Memproses Tindakan Dispatch
 exports.processDispatch = async (req, res) => {
-    // Pastikan menangkap 'pesan_instruksi' yang dikirim dari form
     const { report_id, contact_id, pesan_instruksi } = req.body;
     
     try {
-        // Simpan ke database dengan nama kolom yang benar
         await db.query(
             'INSERT INTO dispatches (report_id, contact_id, pesan_instruksi) VALUES (?, ?, ?)', 
             [report_id, contact_id, pesan_instruksi]
@@ -88,11 +88,11 @@ exports.processDispatch = async (req, res) => {
         res.status(500).send('Error pada server: ' + err.message); 
     }
 };
+
 // Menampilkan Dashboard User beserta Riwayat Laporannya
 exports.getUserDashboard = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        // Ambil riwayat laporan khusus untuk user ini
         const [reports] = await db.query(
             'SELECT * FROM reports WHERE user_id = ? ORDER BY created_at DESC',
             [userId]
@@ -108,11 +108,15 @@ exports.getUserDashboard = async (req, res) => {
 exports.getReportForm = (req, res) => {
     res.render('user/lapor');
 };
+
 // Memperbarui Status Laporan (Diproses/Selesai)
 exports.updateReportStatus = async (req, res) => {
     const { report_id, status } = req.body;
     try {
         await db.query('UPDATE reports SET status = ? WHERE id = ?', [status, report_id]);
         res.redirect('/admin/reports');
-    } catch (err) { console.error(err); res.status(500).send('Error Update'); }
+    } catch (err) { 
+        console.error(err); 
+        res.status(500).send('Error Update'); 
+    }
 };

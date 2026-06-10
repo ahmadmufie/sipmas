@@ -1,5 +1,12 @@
+# Node modules
 node_modules/
+npm-debug.log
+
+# Environment variables
 .env
-uploads/
+
+# MacOS hidden files
 .DS_Store
+
+# Log files
 *.log

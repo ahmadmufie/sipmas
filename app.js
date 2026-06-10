@@ -93,10 +93,10 @@ app.use((req, res) => {
 // ==========================================
 // 7. START SERVER
 // ==========================================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 8080; // Pastikan defaultnya 8080 untuk Azure
+app.listen(PORT, '0.0.0.0', () => {    // TAMBAHKAN '0.0.0.0' DI SINI
     console.log(`==========================================`);
     console.log(`🚀 Server SIPMAS berjalan di Port: ${PORT}`);
-    console.log(`🔗 Akses lokal: http://localhost:${PORT}`);
+    console.log(`🔗 Akses lokal/cloud: http://0.0.0.0:${PORT}`);
     console.log(`==========================================`);
 });

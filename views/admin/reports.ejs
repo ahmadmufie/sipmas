@@ -50,7 +50,7 @@
                             <td><%= new Date(report.created_at).toLocaleString('id-ID') %></td>
                             <td>
                                 <% if (report.foto) { %>
-                                    <img src="/uploads/<%= report.foto %>" class="img-preview" alt="Foto Laporan" onclick="openImageModal('/uploads/<%= report.foto %>')">
+                                    <img src="<%= report.foto %>" alt="Foto Laporan" class="img-preview" onclick="openImageModal('<%= report.foto %>')">
                                 <% } else { %>
                                     <div class="img-preview bg-light d-flex align-items-center justify-content-center"><small>No Img</small></div>
                                 <% } %>
